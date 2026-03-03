@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gaslight Guard — Sarcasm & Gaslighting Detector</title>
+  <meta name="description" content="NLP-powered assistant that helps you recognize veiled verbal abuse and access immediate coping strategies." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0d0d0d;
+      --bg2:         #141414;
+      --bg3:         #1c1c1c;
+      --bg4:         #232323;
+      --border:      #2e2e2e;
+      --border-hi:   #444444;
+      --text:        #e8e8e8;
+      --text-muted:  #666;
+      --text-dim:    #999;
+      --accent:      #e8e8e8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── NAV ─────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      border-bottom: 1px solid var(--border);
+      background: rgba(13,13,13,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; height: 56px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-logo-icon {
+      width: 28px; height: 28px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .nav-logo-text { font-weight: 700; font-size: 0.95rem; }
+    .nav-links {
+      display: flex; align-items: center; gap: 4px; list-style: none;
+    }
+    .nav-links a {
+      padding: 6px 14px;
+      border-radius: 5px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); background: var(--bg3); }
+    .nav-cta {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      border-radius: 6px; padding: 8px 18px;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit; border: none;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .btn-outline:hover { border-color: var(--border-hi); color: var(--text); }
+    .btn-solid {
+      background: var(--text);
+      color: var(--bg);
+    }
+    .btn-solid:hover { opacity: 0.88; }
+
+    /* ─── HERO ────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 32px 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 800px 600px at 50% 0%, rgba(255,255,255,0.025) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+    .hero-badge-dot {
+      width: 6px; height: 6px;
+      background: var(--text-muted);
+      border-radius: 50%;
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      max-width: 800px;
+      margin-bottom: 24px;
+    }
+    .hero h1 span {
+      color: var(--text-muted);
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--text-dim);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+    .hero-actions {
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+    }
+    .btn-lg { padding: 13px 28px; font-size: 0.95rem; border-radius: 8px; }
+    .hero-scroll {
+      margin-top: 80px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.75rem; color: var(--text-muted);
+      animation: bob 2.5s ease-in-out infinite;
+    }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
+    }
+
+    /* ─── SECTION WRAPPER ────────────────────────────────── */
+    section { padding: 96px 32px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .section-body {
+      font-size: 1rem;
+      color: var(--text-dim);
+      max-width: 560px;
+      line-height: 1.75;
+    }
+
+    /* ─── PROBLEM ────────────────────────────────────────── */
+    #problem { border-top: 1px solid var(--border); }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+      margin-top: 48px;
+    }
+    @media (max-width: 768px) { .problem-grid { grid-template-columns: 1fr; gap: 40px; } }
+    .chat-demo {
+      display: flex; flex-direction: column; gap: 10px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .chat-msg {
+      display: flex; flex-direction: column; gap: 4px;
+      max-width: 90%;
+    }
+    .chat-msg.right { align-self: flex-end; align-items: flex-end; }
+    .chat-msg.left { align-self: flex-start; }
+    .chat-bubble {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 14px;
+      font-size: 0.85rem; line-height: 1.6; color: var(--text-dim);
+    }
+    .chat-label {
+      font-size: 0.68rem; color: var(--text-muted);
+      padding: 0 4px;
+    }
+    .chat-detected {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--bg4);
+      border: 1px solid var(--border-hi);
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 0.72rem; color: var(--text-dim);
+      margin-top: 6px; align-self: flex-start;
+    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .dot-warn { background: #aaa; }
+
+    /* ─── LABELS ─────────────────────────────────────────── */
+    #labels { border-top: 1px solid var(--border); background: var(--bg2); }
+    .labels-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .label-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      transition: border-color 0.15s;
+    }
+    .label-card:hover { border-color: var(--border-hi); }
+    .label-icon { font-size: 1.4rem; margin-bottom: 12px; }
+    .label-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .label-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+    .label-example {
+      margin-top: 14px;
+      background: var(--bg4);
+      border-radius: 6px; padding: 10px 12px;
+      font-size: 0.8rem; color: var(--text-dim);
+      font-style: italic; line-height: 1.5;
+      border-left: 2px solid var(--border-hi);
+    }
+
+    /* ─── HOW IT WORKS ───────────────────────────────────── */
+    #how { border-top: 1px solid var(--border); }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 48px;
+    }
+    .step {
+      background: var(--bg2);
+      padding: 28px 24px;
+      display: flex; flex-direction: column; gap: 10px;
+      transition: background 0.15s;
+    }
+    .step:hover { background: var(--bg3); }
+    .step-num {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+    .step-title {
+      font-size: 0.95rem; font-weight: 700;
+    }
+    .step-body { font-size: 0.82rem; color: var(--text-muted); line-height: 1.65; }
+
+    .model-block {
+      margin-top: 48px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+    }
+    .model-pills {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;
+    }
+    .pill {
+      border: 1px solid var(--border);
+      border-radius: 6px; padding: 5px 12px;
+      font-size: 0.78rem; color: var(--text-muted);
+      font-family: 'Menlo', monospace;
+    }
+    .blend-bar {
+      margin-top: 24px;
+      display: flex; gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+      height: 36px;
+    }
+    .blend-seg {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 600; color: var(--bg);
+    }
+    .blend-seg.nn { background: #c0c0c0; width: 70%; }
+    .blend-seg.rb { background: #888; width: 30%; }
+    .blend-label { display: flex; gap: 20px; margin-top: 10px; }
+    .blend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); }
+    .blend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+    /* ─── FEATURES ───────────────────────────────────────── */
+    #features { border-top: 1px solid var(--border); background: var(--bg2); }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .feature-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 24px;
+      display: flex; flex-direction: column; gap: 10px;
+      transition: border-color 0.15s;
+    }
+    .feature-card:hover { border-color: var(--border-hi); }
+    .feature-icon {
+      width: 36px; height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+    .feature-title { font-size: 0.9rem; font-weight: 700; }
+    .feature-body { font-size: 0.82rem; color: var(--text-muted); line-height: 1.65; }
+
+    /* ─── RESOURCES ──────────────────────────────────────── */
+    #resources { border-top: 1px solid var(--border); }
+    .resources-list {
+      display: flex; flex-direction: column; gap: 8px;
+      margin-top: 40px; max-width: 640px;
+    }
+    .resource-row {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px 20px;
+      transition: border-color 0.15s;
+    }
+    .resource-row:hover { border-color: var(--border-hi); }
+    .resource-row a { color: var(--text); font-weight: 600; font-size: 0.88rem; }
+    .resource-detail { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .resource-arrow { color: var(--text-muted); font-size: 0.8rem; }
+
+    /* ─── CTA SECTION ────────────────────────────────────── */
+    #cta {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      background: var(--bg2);
+    }
+    .cta-box {
+      max-width: 560px; margin: 0 auto;
+    }
+    .cta-box p { color: var(--text-dim); font-size: 0.95rem; line-height: 1.7; margin-top: 16px; margin-bottom: 36px; }
+
+    /* ─── FOOTER ─────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .footer-inner {
+      max-width: 1100px; width: 100%;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    .footer-left { font-size: 0.78rem; color: var(--text-muted); }
+    .footer-right { display: flex; gap: 20px; }
+    .footer-right a { font-size: 0.78rem; color: var(--text-muted); transition: color 0.15s; }
+    .footer-right a:hover { color: var(--text); }
+    .footer-disclaimer {
+      font-size: 0.72rem; color: var(--text-muted); text-align: center;
+      max-width: 600px; line-height: 1.6;
+    }
+
+    /* ─── SCROLLBAR ──────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ─── DIVIDER ────────────────────────────────────────── */
+    .divider { width: 100%; height: 1px; background: var(--border); }
+
+    /* ─── API TABLE ──────────────────────────────────────── */
+    .api-table { width: 100%; border-collapse: collapse; margin-top: 24px; font-size: 0.82rem; }
+    .api-table th {
+      text-align: left; padding: 10px 16px;
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--text-muted); border-bottom: 1px solid var(--border);
+    }
+    .api-table td { padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--text-dim); vertical-align: middle; }
+    .api-table tr:last-child td { border-bottom: none; }
+    .api-table tr:hover td { background: var(--bg3); }
+    .method {
+      font-family: 'Menlo', monospace; font-size: 0.72rem;
+      border: 1px solid var(--border); border-radius: 4px;
+      padding: 2px 7px; color: var(--text-muted);
+    }
+    .path { font-family: 'Menlo', monospace; color: var(--text); }
+    .api-wrap {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; margin-top: 48px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ──────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <div class="nav-logo-icon">🛡️</div>
+      <span class="nav-logo-text">Gaslight Guard</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#labels">Detection</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#resources">Resources</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="http://localhost:5173" class="btn btn-solid btn-lg" style="padding:8px 18px;">Launch App →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ──────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="hero-badge-dot"></span>
+    540 Hackathon 2026 &nbsp;·&nbsp; NLP Research
+  </div>
+  <h1>Recognize what<br /><span>words can hide.</span></h1>
+  <p class="hero-sub">
+    Gaslight Guard uses NLP to detect sarcasm, passive aggression, and gaslighting
+    in real conversations — and gives you tools to respond, cope, and protect your reality.
+  </p>
+  <div class="hero-actions">
+    <a href="http://localhost:5173" class="btn btn-solid btn-lg">Try the app →</a>
+    <a href="#how" class="btn btn-outline btn-lg">How it works</a>
+  </div>
+  <div class="hero-scroll">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M7 2v10M3 8l4 4 4-4"/>
+    </svg>
+    scroll to explore
+  </div>
+</section>
+
+<!-- ─── PROBLEM ───────────────────────────────────────────── -->
+<section id="problem">
+  <div class="section-inner">
+    <div class="problem-grid">
+      <div>
+        <p class="section-label">The Problem</p>
+        <h2 class="section-title">Abuse that's<br />invisible to classifiers</h2>
+        <p class="section-body" style="margin-top:16px;">
+          Standard sentiment analysis says <em>"that sounds positive."</em>
+          But victims of gaslighting know the words can twist reality while
+          appearing perfectly polite. Sarcasm, passive aggression, and subtle
+          manipulation fly under the radar — leaving people doubting themselves.
+        </p>
+        <p class="section-body" style="margin-top:14px;">
+          Gaslight Guard blends zero-shot NLP with a curated pattern library to surface
+          what conventional models miss — and arms users with real, immediate support.
+        </p>
+      </div>
+      <div class="chat-demo">
+        <div class="chat-msg left">
+          <span class="chat-label">Partner</span>
+          <div class="chat-bubble">"I never said that. You always misremember things — you're way too sensitive."</div>
+          <div class="chat-detected">
+            <span class="dot dot-warn"></span>
+            Gaslight Guard detected: <strong>Gaslighting · High Risk</strong>
+          </div>
+        </div>
+        <div class="chat-msg right">
+          <span class="chat-label">Standard sentiment API</span>
+          <div class="chat-bubble" style="text-align:right;">"Sentiment: <strong>Neutral</strong>. No flags."</div>
+        </div>
+        <div class="chat-msg left" style="margin-top:8px;">
+          <span class="chat-label">Colleague</span>
+          <div class="chat-bubble">"Oh wow, what a brilliant idea! I'm sure ignoring everyone's feedback will totally work out great."</div>
+          <div class="chat-detected">
+            <span class="dot dot-warn"></span>
+            Gaslight Guard detected: <strong>Sarcastic · Medium Risk</strong>
+          </div>
+        </div>
+        <div class="chat-msg right">
+          <span class="chat-label">Standard sentiment API</span>
+          <div class="chat-bubble" style="text-align:right;">"Sentiment: <strong>Positive</strong>. No flags."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── LABELS ────────────────────────────────────────────── -->
+<section id="labels">
+  <div class="section-inner">
+    <p class="section-label">Detection Labels</p>
+    <h2 class="section-title">Four patterns,<br />one classifier</h2>
+    <p class="section-body">
+      Each message is scored across all four categories simultaneously — catching
+      complex, overlapping patterns that single-label classifiers miss.
+    </p>
+    <div class="labels-grid">
+      <div class="label-card">
+        <div class="label-icon">✅</div>
+        <div class="label-name">Sincere</div>
+        <p class="label-desc">Genuine, healthy communication. Direct language with no hidden negative intent.</p>
+        <div class="label-example">"I appreciate you sharing that. It sounds really difficult."</div>
+      </div>
+      <div class="label-card">
+        <div class="label-icon">😏</div>
+        <div class="label-name">Sarcastic</div>
+        <p class="label-desc">Positive wording with hidden negative intent. The surface meaning is the opposite of what's communicated.</p>
+        <div class="label-example">"Oh great, another meeting that could've been an email."</div>
+      </div>
+      <div class="label-card">
+        <div class="label-icon">😤</div>
+        <div class="label-name">Passive-Aggressive</div>
+        <p class="label-desc">Indirect hostility masked as politeness. Compliance on the surface, resistance underneath.</p>
+        <div class="label-example">"Fine. Do whatever you want. I'm sure you know best."</div>
+      </div>
+      <div class="label-card">
+        <div class="label-icon">🔴</div>
+        <div class="label-name">Gaslighting</div>
+        <p class="label-desc">Language designed to distort the victim's reality — denying events, questioning memory, dismissing feelings.</p>
+        <div class="label-example">"You're imagining things. No one else thinks there's a problem here."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ──────────────────────────────────────── -->
+<section id="how">
+  <div class="section-inner">
+    <p class="section-label">How it works</p>
+    <h2 class="section-title">NLP pipeline,<br />explained</h2>
+
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Input text</div>
+        <p class="step-body">Paste a single message or a full conversation thread. Up to 5 messages can be analyzed together for context.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Zero-shot scoring</div>
+        <p class="step-body">facebook/bart-large-mnli (RoBERTa backbone) scores the text against all four candidate labels simultaneously.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Pattern blending</div>
+        <p class="step-body">Scores are blended 70/30 with a rule-based regex matcher trained on curated gaslighting and sarcasm phrase libraries.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-title">Support output</div>
+        <p class="step-body">For every flagged pattern: a sanity check, coping strategies, suggested responses, and relevant mental-health resources.</p>
+      </div>
+    </div>
+
+    <div class="model-block">
+      <p class="section-label" style="margin-bottom:8px;">Model Architecture</p>
+      <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.65;max-width:600px;">
+        Zero-shot classification with <code style="font-family:monospace;color:var(--text);">facebook/bart-large-mnli</code>
+        — a RoBERTa-based model trained on the MultiNLI corpus, repurposed here for
+        multi-label intent classification without any task-specific fine-tuning.
+      </p>
+      <div class="model-pills">
+        <span class="pill">bart-large-mnli</span>
+        <span class="pill">zero-shot-classification</span>
+        <span class="pill">RoBERTa backbone</span>
+        <span class="pill">rule-based blending</span>
+        <span class="pill">FastAPI backend</span>
+        <span class="pill">React + Vite frontend</span>
+      </div>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-top:20px;">Score composition</p>
+      <div class="blend-bar">
+        <div class="blend-seg nn">70% Zero-shot NLP</div>
+        <div class="blend-seg rb">30% Regex</div>
+      </div>
+      <div class="blend-label">
+        <div class="blend-item"><div class="blend-dot" style="background:#c0c0c0;"></div> Neural (bart-large-mnli)</div>
+        <div class="blend-item"><div class="blend-dot" style="background:#888;"></div> Rule-based pattern library</div>
+      </div>
+    </div>
+
+    <!-- API table -->
+    <div class="api-wrap">
+      <div style="padding:20px 24px;border-bottom:1px solid var(--border);">
+        <p class="section-label" style="margin:0;">REST API</p>
+      </div>
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th>Method</th><th>Endpoint</th><th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="method">POST</span></td><td class="path">/analyze/single</td><td>Analyze a single message</td></tr>
+          <tr><td><span class="method">POST</span></td><td class="path">/analyze/conversation</td><td>Context-window audit (up to 5 messages)</td></tr>
+          <tr><td><span class="method">POST</span></td><td class="path">/evaluate/stress-test</td><td>Sarcasm sentiment-flip stress test</td></tr>
+          <tr><td><span class="method">GET</span></td><td class="path">/resources</td><td>Mental health resources</td></tr>
+          <tr><td><span class="method">GET</span></td><td class="path">/health</td><td>Health check</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURES ──────────────────────────────────────────── -->
+<section id="features">
+  <div class="section-inner">
+    <p class="section-label">Features</p>
+    <h2 class="section-title">More than a<br />classifier</h2>
+    <p class="section-body">
+      Every detection comes with actionable support — not just a label and a score.
+    </p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <div class="feature-title">Single Message Analysis</div>
+        <p class="feature-body">Paste any message and get an instant breakdown — label, confidence score, flagged phrases, and support resources.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔗</div>
+        <div class="feature-title">Conversation Thread Audit</div>
+        <p class="feature-body">Analyze up to 5 messages as a window to detect escalation patterns and dominant toxicity over time.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧪</div>
+        <div class="feature-title">Stress Test Mode</div>
+        <p class="feature-body">Run a built-in evaluation suite of positive-worded insults. Pass threshold: ≥70% correctly flagged as Sarcastic.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <div class="feature-title">Sanity Checks</div>
+        <p class="feature-body">"You are NOT being overly sensitive." — for every toxic detection, a grounding statement to validate the reader's experience.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛠️</div>
+        <div class="feature-title">Response Scripts</div>
+        <p class="feature-body">Suggested responses tailored to the detected pattern — calm, boundary-setting language you can use immediately.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <div class="feature-title">Coping Strategies</div>
+        <p class="feature-body">Evidence-based coping techniques matched to severity level, from grounding exercises to seeking professional support.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── RESOURCES ─────────────────────────────────────────── -->
+<section id="resources">
+  <div class="section-inner">
+    <p class="section-label">Mental Health Resources</p>
+    <h2 class="section-title">Help is<br />always available</h2>
+    <p class="section-body">
+      If you or someone you know is experiencing verbal abuse, gaslighting, or emotional harm — you're not alone.
+    </p>
+    <div class="resources-list">
+      <div class="resource-row">
+        <div>
+          <a href="https://www.crisistextline.org" target="_blank" rel="noopener">Crisis Text Line</a>
+          <div class="resource-detail">Text HOME to 741741 — free, 24/7</div>
+        </div>
+        <span class="resource-arrow">→</span>
+      </div>
+      <div class="resource-row">
+        <div>
+          <a href="https://www.thehotline.org" target="_blank" rel="noopener">National DV Hotline</a>
+          <div class="resource-detail">1-800-799-7233 — domestic violence support</div>
+        </div>
+        <span class="resource-arrow">→</span>
+      </div>
+      <div class="resource-row">
+        <div>
+          <a href="https://www.samhsa.gov/find-help/national-helpline" target="_blank" rel="noopener">SAMHSA Helpline</a>
+          <div class="resource-detail">1-800-662-4357 — mental health & substance use</div>
+        </div>
+        <span class="resource-arrow">→</span>
+      </div>
+      <div class="resource-row">
+        <div>
+          <a href="https://www.7cups.com" target="_blank" rel="noopener">7 Cups</a>
+          <div class="resource-detail">Free online chat with trained listeners</div>
+        </div>
+        <span class="resource-arrow">→</span>
+      </div>
+      <div class="resource-row">
+        <div>
+          <a href="https://www.loveisrespect.org" target="_blank" rel="noopener">Loveisrespect</a>
+          <div class="resource-detail">Chat, call, or text for relationship help</div>
+        </div>
+        <span class="resource-arrow">→</span>
+      </div>
+      <div class="resource-row">
+        <div>
+          <a href="https://www.nami.org" target="_blank" rel="noopener">NAMI</a>
+          <div class="resource-detail">National Alliance on Mental Illness</div>
+        </div>
+        <span class="resource-arrow">→</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ───────────────────────────────────────────────── -->
+<section id="cta">
+  <div class="section-inner">
+    <div class="cta-box">
+      <p class="section-label">Try it now</p>
+      <h2 class="section-title">Trust your reality.</h2>
+      <p>Gaslight Guard is free, open-source, and runs locally. No data leaves your machine.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="http://localhost:5173" class="btn btn-solid btn-lg">Open the app →</a>
+        <a href="https://github.com" class="btn btn-outline btn-lg">View on GitHub</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">
+      🛡️ &nbsp;Gaslight Guard &nbsp;·&nbsp; 540 Hackathon 2026
+    </div>
+    <div class="footer-right">
+      <a href="#problem">Problem</a>
+      <a href="#labels">Detection</a>
+      <a href="#how">How it works</a>
+      <a href="#resources">Resources</a>
+    </div>
+  </div>
+  <p class="footer-disclaimer">
+    For educational purposes only. Gaslight Guard does not replace professional mental health support.
+    If you are in crisis, please contact the resources listed above.
+  </p>
+</footer>
+
+</body>
+</html>
