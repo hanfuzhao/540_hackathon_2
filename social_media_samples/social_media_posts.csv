@@ -1,0 +1,101 @@
+id,text,true_label,platform_context
+1,"just had the best coffee of my life at this little place downtown. highly recommend","Sincere",Twitter
+2,"I really appreciate everyone who showed up to support me yesterday. means a lot","Sincere",Instagram
+3,"genuinely proud of how far I've come this year. not perfect but trying every day","Sincere",Instagram
+4,"shoutout to my roommate for actually doing the dishes without being asked. legend","Sincere",Twitter
+5,"had a rough week but therapy really helped me process a lot. grateful for that space","Sincere",Reddit
+6,"just finished a 10-mile run. legs are dead but honestly feels amazing","Sincere",Twitter
+7,"my professor actually extended the deadline bc life happens. rare W","Sincere",Twitter
+8,"I messed up bad. owe my friend a huge apology and I already texted her","Sincere",Instagram
+9,"dropped my phone and a stranger picked it up and ran to give it back. faith in humanity restored","Sincere",Twitter
+10,"honestly the feedback I got on my paper was harsh but fair. going to use it","Sincere",Reddit
+11,"just learned my coworker has been covering for me all week. need to thank her properly","Sincere",Reddit
+12,"I was wrong about that. said what I said and I own it","Sincere",Twitter
+13,"this album genuinely made me cry in a good way. some art just hits different","Sincere",Twitter
+14,"had an actual 2-hour conversation with my dad tonight. can't remember the last time we talked like that","Sincere",Instagram
+15,"my anxiety has been bad lately but I'm working on it. not embarrassed to say it","Sincere",Reddit
+16,"oh wow another Monday. can't believe this revolutionary concept keeps happening every week","Sarcastic",Twitter
+17,"sure let's definitely schedule a 9am meeting on a Friday. great idea from a great mind","Sarcastic",Twitter
+18,"oh fantastic my wifi cut out during the presentation. truly my villain origin story","Sarcastic",Twitter
+19,"wow they moved the deadline up by two days WITH no notice. love working here","Sarcastic",Reddit
+20,"oh sure I'll just pull that project out of thin air by tomorrow morning. absolutely fine","Sarcastic",Twitter
+21,"what a surprise the group project is entirely on me again. couldn't have seen this coming","Sarcastic",Reddit
+22,"oh brilliant they replaced the coffee machine with a worse one. peak corporate decision-making","Sarcastic",Twitter
+23,"wow thanks for that incredibly useful feedback of 'make it better'. super actionable","Sarcastic",Reddit
+24,"oh great my upstairs neighbor just started what I can only describe as furniture bowling at midnight","Sarcastic",Twitter
+25,"love when people say 'quick question' and then ask seven questions","Sarcastic",Twitter
+26,"oh how thoughtful, they sent a 47-slide deck five minutes before the call","Sarcastic",Reddit
+27,"sure, the bus being 20 minutes late on a rainy day is totally fine and normal","Sarcastic",Twitter
+28,"oh wow my phone autocorrected that text to something completely unhinged. love technology","Sarcastic",Twitter
+29,"great so the 'minor update' broke everything. as minor updates tend to do","Sarcastic",Reddit
+30,"oh amazing they changed the app layout again. because the old one was too intuitive","Sarcastic",Twitter
+31,"fine. whatever everyone wants. I'll just adjust my whole schedule around it as usual","Passive-Aggressive",Twitter
+32,"no worries at all, I only mentioned it like four times but it's totally fine","Passive-Aggressive",Reddit
+33,"I said I'm fine. just tired. it's nothing","Passive-Aggressive",Twitter
+34,"must be nice to not have to think about any of this stuff","Passive-Aggressive",Twitter
+35,"I'll just handle it myself. like I always end up doing anyway","Passive-Aggressive",Reddit
+36,"don't worry about me. I'll figure it out. alone. again","Passive-Aggressive",Twitter
+37,"oh interesting how you suddenly have time now","Passive-Aggressive",Twitter
+38,"no please go have fun. I'll stay and finish everything here. seriously it's fine","Passive-Aggressive",Reddit
+39,"it's giving 'I'll just suffer quietly and hope someone notices' energy but ok","Passive-Aggressive",Twitter
+40,"not that anyone asked but yeah I've been handling this by myself for three weeks","Passive-Aggressive",Reddit
+41,"sure I'll just keep being the only one who cares about this. cool cool cool","Passive-Aggressive",Twitter
+42,"lol must be nice to just forget about plans you made with people","Passive-Aggressive",Twitter
+43,"I didn't say anything because what's the point honestly","Passive-Aggressive",Reddit
+44,"oh you noticed I was upset? only took two days. gold star","Passive-Aggressive",Twitter
+45,"fine I'll just add it to the list of things I apparently deal with solo","Passive-Aggressive",Reddit
+46,"you're literally imagining things. I never said that and you know it","Gaslighting",Reddit
+47,"everyone I've talked to thinks you're being completely unreasonable right now","Gaslighting",Reddit
+48,"you always do this — twist everything into some big dramatic thing","Gaslighting",Twitter
+49,"I was just joking. you're way too sensitive to have a normal conversation with","Gaslighting",Reddit
+50,"no one else has a problem with me. just you. make of that what you will","Gaslighting",Twitter
+51,"you've always had a bad memory so I don't know why you'd trust your version of events","Gaslighting",Reddit
+52,"I literally cannot say anything around you without it becoming a whole situation","Gaslighting",Twitter
+53,"that conversation never happened the way you're describing it. you're misremembering","Gaslighting",Reddit
+54,"you only think that because your friends have been filling your head with nonsense","Gaslighting",Twitter
+55,"I've never once disrespected you. name one time. you can't","Gaslighting",Reddit
+56,"stop making me out to be the bad guy to everyone. you're rewriting history","Gaslighting",Twitter
+57,"you're too emotional right now to see what actually happened","Gaslighting",Reddit
+58,"I said one small thing and suddenly I'm the worst person alive. classic you","Gaslighting",Twitter
+59,"you brought this on yourself honestly. if you hadn't pushed me I never would have said that","Gaslighting",Reddit
+60,"nobody else thinks this is a big deal. you're the only one who has a problem with everything","Gaslighting",Twitter
+61,"lowkey obsessed with how my cat sits in the empty box immediately after I unpack it","Sincere",Twitter
+62,"this job is genuinely killing me softly but the health insurance is good so","Sarcastic",Twitter
+63,"I'll come to the thing. I said I'll come. I'll be fine. don't worry about it.","Passive-Aggressive",Reddit
+64,"you seriously don't remember saying that? I was right there. we were literally talking about it","Gaslighting",Reddit
+65,"today was hard but I got through it and that counts for something","Sincere",Instagram
+66,"oh wow what great timing to tell me this information. truly impeccable as always","Sarcastic",Twitter
+67,"it's whatever. I'm not even upset. just noting it for the record","Passive-Aggressive",Twitter
+68,"stop being so paranoid. I have never given you any reason not to trust me","Gaslighting",Reddit
+69,"called my grandma just to catch up. she sounded so happy. should do it more often","Sincere",Instagram
+70,"sure let's definitely do the entire thing over from scratch two days before the deadline","Sarcastic",Reddit
+71,"no please finish your thought. I wasn't saying anything important anyway","Passive-Aggressive",Twitter
+72,"you're acting like this is abuse. do you hear yourself right now","Gaslighting",Reddit
+73,"got feedback I didn't want but genuinely needed. humbling but good","Sincere",Reddit
+74,"oh wow you really remembered that detail. how incredibly useful of you. now","Sarcastic",Twitter
+75,"it's not a big deal. forget I brought it up. seriously just drop it","Passive-Aggressive",Reddit
+76,"I only behaved like that because of how you were acting. you started this","Gaslighting",Twitter
+77,"slept 8 hours for the first time in weeks and genuinely feel like a different person","Sincere",Twitter
+78,"oh yes please send me the 4MB jpeg directly in Slack. PDF would be too easy","Sarcastic",Reddit
+79,"I guess I just don't matter as much as other things. that's fine. it's fine.","Passive-Aggressive",Instagram
+80,"your version of events is just so wildly different from reality that I don't know what to say","Gaslighting",Reddit
+81,"finally finished the essay. it's not my best work but it's honest and I'm okay with that","Sincere",Reddit
+82,"oh incredible they put the new software update out on a Friday afternoon. genius move","Sarcastic",Twitter
+83,"I'll just wait. it's fine. I'm used to waiting.","Passive-Aggressive",Twitter
+84,"you're always the victim in every story you tell. have you ever noticed that","Gaslighting",Reddit
+85,"my friend drove 2 hours to help me move. didn't ask for anything. people can be so good","Sincere",Twitter
+86,"wow great so the 'easy fix' took six hours. love an easy fix","Sarcastic",Reddit
+87,"oh no I don't need help. I'll just keep struggling silently. much preferred","Passive-Aggressive",Reddit
+88,"if you actually listened to me you'd know that I never said that","Gaslighting",Twitter
+89,"told someone how I was actually feeling today instead of saying 'I'm fine'. small win","Sincere",Instagram
+90,"oh perfect so the meeting ran 45 minutes over. right on schedule as always","Sarcastic",Twitter
+91,"sure go ahead and make plans without asking me. I clearly wasn't part of this anyway","Passive-Aggressive",Twitter
+92,"I've never treated you badly. I've been nothing but patient and you act like I'm the problem","Gaslighting",Reddit
+93,"genuinely laughed until I cried at dinner tonight. needed that so much","Sincere",Twitter
+94,"ah yes the classic 'reply all' on an email chain of 40 people. bold choice","Sarcastic",Reddit
+95,"I didn't say anything because nothing I say ever actually matters here","Passive-Aggressive",Reddit
+96,"you're so focused on feeling hurt that you can't see what's actually true","Gaslighting",Twitter
+97,"started journaling again this week. forgot how much it helps to just get it out","Sincere",Instagram
+98,"oh wonderful so the 'one small change' broke three other things. software is great","Sarcastic",Reddit
+99,"don't worry about it. I'll just handle everything like I always do. no big deal","Passive-Aggressive",Twitter
+100,"everyone thinks you're too much to deal with. I'm the only one who puts up with you","Gaslighting",Reddit
