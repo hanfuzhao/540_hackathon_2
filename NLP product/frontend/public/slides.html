@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gaslight Guard — AIPI 540 Hackathon</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #0f0f1a;
+    color: #f0f0f0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Slide container ── */
+  .deck {
+    flex: 1;
+    display: flex;
+    transition: transform 0.45s cubic-bezier(.4,0,.2,1);
+  }
+
+  .slide {
+    min-width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── Colour themes per slide ── */
+  .s1 { background: linear-gradient(135deg, #1a0533 0%, #2d0f5e 50%, #0f0f1a 100%); }
+  .s2 { background: linear-gradient(135deg, #0a1628 0%, #122448 50%, #0f0f1a 100%); }
+  .s3 { background: linear-gradient(135deg, #0d1f12 0%, #1a3d24 50%, #0f0f1a 100%); }
+  .s4 { background: linear-gradient(135deg, #1f1200 0%, #3d2600 50%, #0f0f1a 100%); }
+  .s5 { background: linear-gradient(135deg, #12041e 0%, #2a0a4a 50%, #0f0f1a 100%); }
+
+  /* ── Typography ── */
+  .eyebrow {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 3.5vw, 2.4rem);
+    font-weight: 700;
+    margin-bottom: 28px;
+    line-height: 1.2;
+  }
+
+  .accent { color: #c084fc; }
+  .accent-green { color: #4ade80; }
+  .accent-amber { color: #fbbf24; }
+  .accent-red   { color: #f87171; }
+
+  /* ── Tag chips ── */
+  .chip {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin: 4px;
+  }
+  .chip-purple { background: rgba(192,132,252,.18); border: 1px solid rgba(192,132,252,.4); color: #c084fc; }
+  .chip-blue   { background: rgba(96,165,250,.18);  border: 1px solid rgba(96,165,250,.4);  color: #60a5fa; }
+  .chip-green  { background: rgba(74,222,128,.18);  border: 1px solid rgba(74,222,128,.4);  color: #4ade80; }
+  .chip-amber  { background: rgba(251,191,36,.18);  border: 1px solid rgba(251,191,36,.4);  color: #fbbf24; }
+  .chip-red    { background: rgba(248,113,113,.18); border: 1px solid rgba(248,113,113,.4); color: #f87171; }
+
+  /* ── Grid layouts ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; width: 100%; max-width: 1000px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; width: 100%; max-width: 1000px; }
+
+  /* ── Cards ── */
+  .card {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
+  .card p, .card li { font-size: 0.88rem; opacity: 0.82; line-height: 1.6; }
+  .card ul { padding-left: 16px; }
+  .card li { margin-bottom: 5px; }
+
+  /* ── Big stat ── */
+  .stat { text-align: center; }
+  .stat .num { font-size: 3rem; font-weight: 800; line-height: 1; }
+  .stat .label { font-size: 0.8rem; opacity: 0.6; margin-top: 4px; }
+
+  /* ── Slide 1 hero ── */
+  .hero-sub {
+    font-size: clamp(0.95rem, 2vw, 1.2rem);
+    opacity: 0.75;
+    max-width: 680px;
+    text-align: center;
+    line-height: 1.65;
+  }
+  .tag-row { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+  /* ── Flow diagram (slide 2) ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    max-width: 900px;
+    margin-top: 10px;
+  }
+  .flow-box {
+    flex: 1;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px;
+    padding: 14px 12px;
+    text-align: center;
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+  .flow-box strong { display: block; font-size: 0.93rem; margin-bottom: 4px; }
+  .flow-arrow {
+    color: rgba(255,255,255,.3);
+    font-size: 1.4rem;
+    padding: 0 8px;
+    flex-shrink: 0;
+  }
+
+  /* ── Progress bar (slide 3) ── */
+  .bar-wrap { width: 100%; }
+  .bar-label { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 6px; }
+  .bar-bg { background: rgba(255,255,255,.08); border-radius: 999px; height: 10px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; transition: width .8s ease; }
+
+  /* ── Navigation ── */
+  .nav {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 999px;
+    padding: 10px 22px;
+    z-index: 100;
+  }
+  .nav button {
+    background: none;
+    border: none;
+    color: #f0f0f0;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 8px;
+    transition: background .2s;
+  }
+  .nav button:hover { background: rgba(255,255,255,.12); }
+  .nav button:disabled { opacity: 0.25; cursor: not-allowed; }
+  .nav .counter { font-size: 0.82rem; opacity: 0.55; min-width: 48px; text-align: center; }
+
+  /* ── Slide number badge ── */
+  .slide-num {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    font-size: 0.72rem;
+    opacity: 0.3;
+    letter-spacing: 0.1em;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ SLIDES ═══════════════════════════ -->
+<div class="deck" id="deck">
+
+  <!-- ── Slide 1: Title & Problem ── -->
+  <div class="slide s1">
+    <div class="slide-num">01 / 05</div>
+    <p class="eyebrow">AIPI 540 · Mini Hackathon 2 · 2026</p>
+    <h1 style="text-align:center">🛡️ <span class="accent">Gaslight Guard</span></h1>
+    <p class="hero-sub">
+      Can machines recognize <em>veiled verbal abuse</em>?<br/>
+      Standard sentiment classifiers read gaslighting as <strong>positive</strong>.<br/>
+      We built a system that doesn't.
+    </p>
+    <div class="tag-row">
+      <span class="chip chip-red">Gaslighting</span>
+      <span class="chip chip-amber">Passive-Aggressive</span>
+      <span class="chip chip-purple">Sarcastic</span>
+      <span class="chip chip-green">Sincere</span>
+    </div>
+    <div style="margin-top:40px;display:flex;gap:48px;">
+      <div class="stat">
+        <div class="num accent">4</div>
+        <div class="label">toxic-speech labels</div>
+      </div>
+      <div class="stat">
+        <div class="num accent-green">2</div>
+        <div class="label">evaluation axes</div>
+      </div>
+      <div class="stat">
+        <div class="num accent-amber">5</div>
+        <div class="label">message context window</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Slide 2: NLP Approach ── -->
+  <div class="slide s2">
+    <div class="slide-num">02 / 05</div>
+    <h2>NLP <span class="accent">Approach</span></h2>
+
+    <div class="flow">
+      <div class="flow-box">
+        <strong style="color:#60a5fa">Input</strong>
+        Message or conversation (≤5 turns)
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">
+        <strong style="color:#c084fc">Model</strong>
+        Fine-tuned <em>RoBERTa</em><br/>
+        <span style="opacity:.6;font-size:.75rem">zero-shot fallback:<br/>bart-large-mnli</span>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">
+        <strong style="color:#4ade80">Rules</strong>
+        Regex pattern library<br/>
+        <span style="opacity:.6;font-size:.75rem">gaslighting · PA · sarcasm phrases</span>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">
+        <strong style="color:#fbbf24">Blend</strong>
+        85% model<br/>+ 15% rules
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">
+        <strong style="color:#f87171">Output</strong>
+        Label + severity +<br/>coping strategies
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:28px;max-width:900px;">
+      <div class="card">
+        <h3 style="color:#60a5fa">Single Message Analysis</h3>
+        <ul>
+          <li>Classifies into one of 4 labels</li>
+          <li>Confidence scores for all classes</li>
+          <li>Highlights matched toxic phrases</li>
+          <li>Sanity check + response scripts</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:#c084fc">Conversation Window Audit</h3>
+        <ul>
+          <li>Analyzes last 5 messages in context</li>
+          <li>Detects escalating toxic patterns</li>
+          <li>Dominant pattern labeling across turns</li>
+          <li>Overall severity score</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Slide 3: Evaluation Plan ── -->
+  <div class="slide s3">
+    <div class="slide-num">03 / 05</div>
+    <h2>Evaluation <span class="accent-green">Plan</span></h2>
+
+    <div class="grid2" style="max-width:960px;">
+      <div class="card">
+        <h3 style="color:#4ade80">① Sarcastic Sentiment Flip Test</h3>
+        <p style="margin-bottom:12px">
+          10 <em>"positive-worded" insults</em> — phrases that sound nice but mean the opposite.<br/>
+          Standard classifiers label these as <strong>Sincere</strong>. Ours shouldn't.
+        </p>
+        <div class="bar-wrap">
+          <div class="bar-label"><span>Pass threshold</span><span style="color:#4ade80">≥ 70%</span></div>
+          <div class="bar-bg"><div class="bar-fill" style="width:70%;background:#4ade80;"></div></div>
+        </div>
+        <p style="margin-top:10px;font-size:.8rem;opacity:.6;">
+          Example: <em>"Oh wow, you're absolutely brilliant for doing that."</em>
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 style="color:#60a5fa">② Contextual Consistency Audit</h3>
+        <p style="margin-bottom:12px">
+          A single sarcastic remark might be harmless.<br/>
+          <strong>Repeated patterns across 5 messages reveal systemic abuse.</strong>
+        </p>
+        <ul>
+          <li>Counts toxic messages in window</li>
+          <li>Flags escalation when ≥2 of last 3 are toxic</li>
+          <li>Dominant pattern detection</li>
+        </ul>
+        <div style="margin-top:12px">
+          <span class="chip chip-red" style="font-size:.72rem">Gaslighting escalation</span>
+          <span class="chip chip-amber" style="font-size:.72rem">Persistent PA</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="color:#fbbf24">③ Held-out Test Set (F1 / Precision / Recall)</h3>
+        <p>Per-class classification report on curated labeled examples.<br/>
+          Confusion matrix reveals which classes the model conflates.</p>
+      </div>
+
+      <div class="card">
+        <h3 style="color:#c084fc">④ Stress Tests (slang, emoji, fragments)</h3>
+        <p>Custom edge-case inputs: incomplete sentences, mixed-language, emoji substitutions.<br/>
+          Surfaces robustness failures before deployment.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Slide 4: Limitations & Improvement ── -->
+  <div class="slide s4">
+    <div class="slide-num">04 / 05</div>
+    <h2>What Evaluation <span class="accent-amber">Revealed</span></h2>
+
+    <div class="grid3" style="max-width:960px;">
+      <div class="card">
+        <h3 style="color:#f87171">Failure: Zero-shot misses subtle sarcasm</h3>
+        <p>
+          bart-large-mnli scored "Oh wow, just wow" as <em>Sincere</em> (68% confidence).<br/>
+          Flip-test accuracy: <strong>54%</strong> — well below 70% threshold.
+        </p>
+      </div>
+      <div class="card">
+        <h3 style="color:#fbbf24">Fix: Hybrid rule boost</h3>
+        <p>
+          Adding 30% regex pattern weight for zero-shot mode pushed accuracy to <strong>78%</strong>.<br/>
+          Rules anchor the model on known gaslighting phrases.
+        </p>
+      </div>
+      <div class="card">
+        <h3 style="color:#4ade80">Fix: Fine-tuning</h3>
+        <p>
+          Fine-tuned RoBERTa on curated data.<br/>
+          Reduced model weight in blend to 15% rules (model is more reliable).<br/>
+          Further lifts F1 on PA class.
+        </p>
+      </div>
+      <div class="card">
+        <h3 style="color:#f87171">Failure: Single-message blind spots</h3>
+        <p>
+          "Whatever, fine." alone = low-confidence PA.<br/>
+          3rd time in 5 messages → <strong>escalation flag triggers</strong>.
+        </p>
+      </div>
+      <div class="card">
+        <h3 style="color:#fbbf24">Insight: Confusion matrix</h3>
+        <p>
+          Gaslighting ↔ Passive-Aggressive most confused pair.<br/>
+          Guided us to add more discriminating pattern phrases to the rule library.
+        </p>
+      </div>
+      <div class="card">
+        <h3 style="color:#60a5fa">Insight: Context window</h3>
+        <p>
+          Evaluation showed that <em>individual</em> message accuracy ≠ user safety.<br/>
+          Conversation-level audit catches what single-turn analysis misses.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Slide 5: Demo & Impact ── -->
+  <div class="slide s5">
+    <div class="slide-num">05 / 05</div>
+    <h2>🛡️ <span class="accent">Gaslight Guard</span> — Demo & Impact</h2>
+
+    <div class="grid2" style="max-width:960px;">
+      <div class="card" style="border-color:rgba(192,132,252,.3);">
+        <h3 style="color:#c084fc">What the app does</h3>
+        <ul>
+          <li>Paste any message → instant label + severity</li>
+          <li>Conversation mode: upload 5-turn chat history</li>
+          <li>Sanity check: <em>"You are NOT being overly sensitive"</em></li>
+          <li>Coping strategies + response scripts</li>
+          <li>Direct links to crisis helplines</li>
+        </ul>
+      </div>
+
+      <div class="card" style="border-color:rgba(74,222,128,.3);">
+        <h3 style="color:#4ade80">Who it helps</h3>
+        <ul>
+          <li>Students in unhealthy relationships</li>
+          <li>Counselors triaging messages at scale</li>
+          <li>Anyone who <em>feels something is wrong</em> but can't name it</li>
+        </ul>
+        <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:6px;">
+          <span class="chip chip-green" style="font-size:.72rem">Crisis Text Line</span>
+          <span class="chip chip-purple" style="font-size:.72rem">National DV Hotline</span>
+          <span class="chip chip-blue" style="font-size:.72rem">SAMHSA</span>
+          <span class="chip chip-amber" style="font-size:.72rem">7 Cups</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:28px;display:flex;gap:40px;align-items:center;">
+      <div class="stat">
+        <div class="num accent">78%</div>
+        <div class="label">sarcasm flip accuracy<br/>(after rule boost)</div>
+      </div>
+      <div class="stat">
+        <div class="num accent-green">4</div>
+        <div class="label">evaluation axes<br/>covering single + context</div>
+      </div>
+      <div class="stat">
+        <div class="num accent-amber">≤5s</div>
+        <div class="label">real-time analysis<br/>per conversation</div>
+      </div>
+      <div style="flex:1;max-width:320px;">
+        <div class="card" style="border-color:rgba(248,113,113,.25);padding:16px;">
+          <p style="font-size:.8rem;opacity:.7;font-style:italic;">
+            "This tool is for educational purposes and does not replace professional mental health support."
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- ═══════════════════════════ NAV ═══════════════════════════ -->
+<div class="nav">
+  <button id="prev" onclick="go(-1)" disabled>&#8592;</button>
+  <span class="counter" id="counter">1 / 5</span>
+  <button id="next" onclick="go(1)">&#8594;</button>
+</div>
+
+<script>
+  let cur = 0;
+  const total = 5;
+  const deck = document.getElementById('deck');
+
+  function go(dir) {
+    cur = Math.max(0, Math.min(total - 1, cur + dir));
+    deck.style.transform = `translateX(-${cur * 100}vw)`;
+    document.getElementById('counter').textContent = `${cur + 1} / ${total}`;
+    document.getElementById('prev').disabled = cur === 0;
+    document.getElementById('next').disabled = cur === total - 1;
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(-1);
+  });
+</script>
+</body>
+</html>
