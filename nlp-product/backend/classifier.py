@@ -46,14 +46,14 @@ def _get_finetuned():
 
 
 def _get_zeroshot():
-    """Zero-shot fallback using bart-large-mnli."""
+    """Zero-shot fallback using a lightweight model that fits in 512MB RAM."""
     global _zeroshot_pipeline
     if _zeroshot_pipeline is None:
         from transformers import pipeline as hf_pipeline
         print("[classifier] Fine-tuned model not found — using zero-shot fallback")
         _zeroshot_pipeline = hf_pipeline(
             "zero-shot-classification",
-            model="facebook/bart-large-mnli",
+            model="typeform/distilbart-mnli-12-1",
             device=-1,
         )
     return _zeroshot_pipeline
@@ -199,6 +199,73 @@ RESPONSE_SUGGESTIONS = {
 # Core analysis functions
 # ---------------------------------------------------------------------------
 
+GASLIGHTING_KEYWORDS = [
+    "you're imagining", "never said", "never happened", "too sensitive",
+    "overreacting", "you're crazy", "you're paranoid", "making things up",
+    "remember it wrong", "misremembering", "you always do this",
+    "your fault", "brought this on yourself", "everyone agrees",
+    "no one believes you", "you're delusional", "stop being dramatic",
+    "need therapy", "just joking", "can't take a joke", "you started this",
+    "your friends lied", "you're the problem", "you're unstable",
+    "twisted my words", "rewriting history", "literally in your head",
+]
+
+PASSIVE_AGGRESSIVE_KEYWORDS = [
+    "fine whatever", "do whatever you want", "don't worry about me",
+    "i'll just", "like always", "as usual", "no worries at all",
+    "must be nice", "i'm fine really", "forget i said", "if you say so",
+    "i guess", "not that it matters", "oh so now", "suddenly you",
+    "you remembered", "only waited", "handle it alone", "no one asked",
+    "i'll just sit here", "go have fun", "i'll manage",
+]
+
+SARCASM_KEYWORDS = [
+    "oh wow", "oh great", "oh brilliant", "oh fantastic", "oh sure",
+    "oh absolutely", "oh perfect", "what a surprise", "totally makes sense",
+    "clearly the best", "genius idea", "wonderful plan", "love how",
+    "great job breaking", "couldn't have seen", "mark the calendar",
+    "yeah right", "sure sure", "obviously", "groundbreaking",
+    "revolutionary", "who could have seen this coming", "shocker",
+    "color me surprised", "how convenient",
+]
+
+SINCERE_KEYWORDS = [
+    "i appreciate", "thank you", "i'm sorry", "i understand",
+    "i hear you", "that must be", "i care", "how are you",
+    "i'm here for you", "let's talk", "i want to help",
+    "genuinely", "honestly", "i value", "i respect",
+]
+
+
+def _keyword_scores(text: str) -> Dict[str, float]:
+    """Enhanced keyword-based scoring when no model is available."""
+    t = text.lower()
+
+    def count_hits(keywords):
+        return sum(1 for kw in keywords if kw in t)
+
+    gl = count_hits(GASLIGHTING_KEYWORDS)
+    pa = count_hits(PASSIVE_AGGRESSIVE_KEYWORDS)
+    sa = count_hits(SARCASM_KEYWORDS)
+    si = count_hits(SINCERE_KEYWORDS)
+
+    # Also include pattern scores
+    pscores = _pattern_scores(text)
+    gl += pscores["Gaslighting"] * 5
+    pa += pscores["Passive-Aggressive"] * 5
+    sa += pscores["Sarcastic"] * 5
+
+    # Base scores with slight Sincere bias when nothing detected
+    scores = {
+        "Sincere":            max(0.1, si * 0.4 + (0.5 if (gl + pa + sa) == 0 else 0)),
+        "Sarcastic":          sa * 0.4,
+        "Passive-Aggressive": pa * 0.4,
+        "Gaslighting":        gl * 0.4,
+    }
+    total = sum(scores.values()) or 1
+    return {k: v / total for k, v in scores.items()}
+
+
 def _pattern_scores(text: str) -> Dict[str, float]:
     """Return raw pattern-match scores (0-1) for each toxic label."""
     t = text.lower()
@@ -264,12 +331,9 @@ def analyze_single(text: str) -> AnalysisResult:
 
     try:
         model_scores = _get_scores_from_model(text)
-    except Exception:
-        # Rule-only fallback when no model is reachable
-        pscores = _pattern_scores(text)
-        total = sum(pscores.values()) or 1
-        model_scores = {k: v / total for k, v in pscores.items()}
-        model_scores["Sincere"] = max(0.0, 1.0 - sum(pscores.values()))
+    except Exception as e:
+        print(f"[classifier] Model unavailable ({e}) — using keyword fallback")
+        model_scores = _keyword_scores(text)
 
     # Blend model scores with pattern-matching scores
     # Fine-tuned: 85% model / 15% rules  |  Zero-shot: 70% model / 30% rules
