@@ -1,28 +1,137 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:      #111111;
-  --bg2:     #1a1a1a;
-  --bg3:     #222222;
-  --border:  #333333;
-  --text:    #e0e0e0;
-  --text-muted: #777777;
-  --accent:  #e0e0e0;
+  --bg:           #0a0a0f;
+  --bg2:          #12121a;
+  --bg3:          #1a1a26;
+  --bg4:          #222233;
+  --border:       #2a2a3d;
+  --border-hover: #3d3d55;
+  --text:         #e8e8f0;
+  --text-muted:   #8888a0;
+  --text-dim:     #55556a;
+  --accent:       #7c6ff5;
+  --accent-dim:   #6355d8;
 
-  --sincere:            #e0e0e0;
-  --sarcastic:          #e0e0e0;
-  --passive:            #e0e0e0;
-  --gaslight:           #e0e0e0;
-  --sincere-bg:         #2a2a2a;
-  --sarcastic-bg:       #2a2a2a;
-  --passive-bg:         #2a2a2a;
-  --gaslight-bg:        #2a2a2a;
+  --sincere:       #4ade80;
+  --sincere-bg:    rgba(74, 222, 128, 0.08);
+  --sincere-border:rgba(74, 222, 128, 0.20);
+
+  --sarcastic:       #fbbf24;
+  --sarcastic-bg:    rgba(251, 191, 36, 0.08);
+  --sarcastic-border:rgba(251, 191, 36, 0.20);
+
+  --passive:       #fb923c;
+  --passive-bg:    rgba(251, 146, 60, 0.08);
+  --passive-border:rgba(251, 146, 60, 0.20);
+
+  --gaslight:       #f87171;
+  --gaslight-bg:    rgba(248, 113, 113, 0.08);
+  --gaslight-border:rgba(248, 113, 113, 0.20);
+
+  --low:       #4ade80;
+  --medium:    #fbbf24;
+  --high:      #f87171;
 }
 
-html { font-family: 'Inter', system-ui, sans-serif; font-size: 16px; }
+html { font-family: 'Inter', system-ui, sans-serif; font-size: 16px; -webkit-font-smoothing: antialiased; }
 body { background: var(--bg); color: var(--text); min-height: 100vh; }
-a { color: var(--text); text-decoration: underline; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
 
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg2); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+textarea:focus, input:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 2px rgba(124, 111, 245, 0.15); }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.fade-in { animation: fadeIn 0.3s ease-out forwards; }
+.slide-in { animation: slideIn 0.3s ease-out forwards; }
+.pulse { animation: pulse 1.5s ease-in-out infinite; }
+
+.card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: border-color 0.2s;
+}
+.card:hover {
+  border-color: var(--border-hover);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  width: 100%;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-dim);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(124, 111, 245, 0.25);
+}
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--bg3);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.btn-secondary:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
+  background: var(--bg4);
+}
+
+.section-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent), #a78bfa, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@media (max-width: 640px) {
+  .hide-mobile { display: none !important; }
+  .card { padding: 16px; border-radius: 10px; }
+}

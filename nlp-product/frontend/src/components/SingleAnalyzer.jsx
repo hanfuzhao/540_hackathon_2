@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Send, Loader2 } from 'lucide-react'
 import { analyzeSingle } from '../api'
 import LabelBadge from './LabelBadge'
 import ScoreBar from './ScoreBar'
@@ -11,21 +13,11 @@ const EXAMPLES = {
   Sincere: "I appreciate you sharing that with me. It sounds really difficult, and I'm here if you want to talk.",
 }
 
-const btn = {
-  base: {
-    background: 'var(--bg3)', border: '1px solid var(--border)',
-    borderRadius: '4px', padding: '6px 14px', cursor: 'pointer',
-    color: 'var(--text-muted)', fontSize: '0.8rem', fontFamily: 'inherit',
-  },
-  primary: (disabled) => ({
-    background: disabled ? 'var(--bg3)' : 'var(--bg3)',
-    color: disabled ? 'var(--text-muted)' : 'var(--text)',
-    border: '1px solid var(--border)',
-    borderRadius: '6px', padding: '12px',
-    fontSize: '0.9rem', fontWeight: 600,
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    fontFamily: 'inherit', width: '100%',
-  }),
+const LABEL_COLORS = {
+  Gaslighting: 'var(--gaslight)',
+  Sarcastic: 'var(--sarcastic)',
+  'Passive-Aggressive': 'var(--passive)',
+  Sincere: 'var(--sincere)',
 }
 
 export default function SingleAnalyzer() {
@@ -53,10 +45,18 @@ export default function SingleAnalyzer() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {/* Quick examples */}
       <div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '8px' }}>Examples:</p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+        <p className="section-label">Try an example</p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           {Object.entries(EXAMPLES).map(([label, ex]) => (
-            <button key={label} onClick={() => { setText(ex); setResult(null) }} style={btn.base}>
+            <button
+              key={label}
+              onClick={() => { setText(ex); setResult(null) }}
+              className="btn-secondary"
+              style={{
+                borderLeft: `3px solid ${LABEL_COLORS[label]}`,
+                borderRadius: '6px',
+              }}
+            >
               {label}
             </button>
           ))}
@@ -74,62 +74,95 @@ export default function SingleAnalyzer() {
           maxLength={2000}
           style={{
             width: '100%', background: 'var(--bg3)',
-            border: '1px solid var(--border)', borderRadius: '6px',
-            color: 'var(--text)', padding: '14px', fontSize: '0.9rem',
+            border: '1px solid var(--border)', borderRadius: '10px',
+            color: 'var(--text)', padding: '16px', fontSize: '0.9rem',
             resize: 'vertical', outline: 'none', fontFamily: 'inherit', lineHeight: 1.6,
+            transition: 'border-color 0.2s',
           }}
         />
-        <span style={{ position: 'absolute', bottom: '10px', right: '12px', color: 'var(--text-muted)', fontSize: '0.72rem' }}>
+        <span style={{
+          position: 'absolute', bottom: '12px', right: '14px',
+          color: 'var(--text-dim)', fontSize: '0.7rem',
+        }}>
           {text.length}/2000
         </span>
       </div>
 
-      <button onClick={handleAnalyze} disabled={loading || !text.trim()} style={btn.primary(loading || !text.trim())}>
-        {loading ? 'Analyzing...' : 'Analyze'}
+      <button
+        onClick={handleAnalyze}
+        disabled={loading || !text.trim()}
+        className="btn-primary"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+      >
+        {loading ? (
+          <>
+            <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+            Analyzing...
+          </>
+        ) : (
+          <>
+            <Send size={16} />
+            Analyze
+          </>
+        )}
       </button>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
       {error && (
-        <div style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '12px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+        <div className="card" style={{
+          borderColor: 'var(--gaslight-border)',
+          background: 'var(--gaslight-bg)',
+          color: 'var(--text-muted)', fontSize: '0.85rem',
+        }}>
           {error}
         </div>
       )}
 
-      {result && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {/* Result header */}
-          <div style={{
-            background: 'var(--bg3)', border: '1px solid var(--border)',
-            borderRadius: '8px', padding: '18px',
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px',
-          }}>
-            <div>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Result</p>
-              <LabelBadge label={result.label} size="lg" />
+      <AnimatePresence>
+        {result && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}
+          >
+            {/* Result header */}
+            <div className="card" style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              flexWrap: 'wrap', gap: '12px',
+              borderLeft: `3px solid ${LABEL_COLORS[result.label] || 'var(--accent)'}`,
+            }}>
+              <div>
+                <p className="section-label" style={{ marginBottom: '8px' }}>Result</p>
+                <LabelBadge label={result.label} size="lg" />
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '2px' }}>Confidence</p>
+                <p style={{ fontSize: '2rem', fontWeight: 700, color: LABEL_COLORS[result.label] || 'var(--text)' }}>
+                  {(result.confidence * 100).toFixed(0)}
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>%</span>
+                </p>
+                <p style={{ color: 'var(--text-dim)', fontSize: '0.7rem' }}>{result.elapsed_seconds}s</p>
+              </div>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '2px' }}>Confidence</p>
-              <p style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text)' }}>
-                {(result.confidence * 100).toFixed(0)}<span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>%</span>
-              </p>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>{result.elapsed_seconds}s</p>
+
+            {/* Score breakdown */}
+            <div className="card">
+              <p className="section-label">Score Breakdown</p>
+              <ScoreBar scores={result.all_scores} />
             </div>
-          </div>
 
-          {/* Score breakdown */}
-          <div style={{ background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: '8px', padding: '18px' }}>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>Score Breakdown</p>
-            <ScoreBar scores={result.all_scores} />
-          </div>
-
-          <SanityCheckCard
-            sanityCheck={result.sanity_check}
-            copingStrategies={result.coping_strategies}
-            suggestedResponses={result.suggested_responses}
-            severity={result.severity}
-            patternHighlights={result.pattern_highlights}
-          />
-        </div>
-      )}
+            <SanityCheckCard
+              sanityCheck={result.sanity_check}
+              copingStrategies={result.coping_strategies}
+              suggestedResponses={result.suggested_responses}
+              severity={result.severity}
+              patternHighlights={result.pattern_highlights}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
